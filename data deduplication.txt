@@ -1,0 +1,268 @@
+Sample Code: 
+
+Logic to Connect Database: 
+
+public static Connection getConnection() { 
+
+        Connection conn = null; 
+
+        String url = "jdbc:mysql://localhost:3306/"; 
+
+        String dbName = "pri_multiKey"; 
+
+        String driver = "com.mysql.jdbc.Driver"; 
+
+        String userName = "root"; 
+
+        String password = "root"; 
+
+        try { 
+
+            Class.forName(driver).newInstance(); 
+
+            conn = DriverManager.getConnection(url + dbName, userName, password); 
+
+            System.out.println("Connected to the database"); 
+
+    } catch (Exception e) { 
+
+            e.printStackTrace(); 
+
+        } 
+
+        return conn; 
+
+    } 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+Logic to Connect to Cloud Server: 
+
+public synchronized boolean connect() { 
+
+        try { 
+
+            URL url = new URL("ftp://" + user + ":" + password + "@" + host + "/" + remoteFile + ";type=i"); 
+
+            m_client = url.openConnection(); 
+
+            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.."+"ftp://" + user + ":" + password + "@" + host + "/" + remoteFile + ";type=i"); 
+
+            return true; 
+
+ 
+
+        } catch (Exception ex) { 
+
+            ex.printStackTrace(); 
+
+            StringWriter sw0 = new StringWriter(); 
+
+            PrintWriter p0 = new PrintWriter(sw0, true); 
+
+            ex.printStackTrace(p0); 
+
+            erMesg = sw0.getBuffer().toString(); 
+
+            return false; 
+
+        } 
+
+    } 
+
+
+
+Logic to Upload File 
+
+public synchronized boolean uploadFile(InputStream is) { 
+
+    //public synchronized boolean uploadFile(String localfilename) { 
+
+        try { 
+
+         //   InputStream is = new FileInputStream(localfilename); 
+
+            BufferedInputStream bis = new BufferedInputStream(is); 
+
+            OutputStream os = m_client.getOutputStream(); 
+
+            BufferedOutputStream bos = new BufferedOutputStream(os); 
+
+            byte[] buffer = new byte[1024]; 
+
+            int readCount; 
+
+ 
+
+            while ((readCount = bis.read(buffer)) > 0) { 
+
+                bos.write(buffer, 0, readCount); 
+
+            } 
+
+            bos.close(); 
+
+ 
+
+            this.succMesg = "Uploaded!"; 
+
+ 
+
+            return true; 
+
+        } catch (Exception ex) { 
+
+            ex.printStackTrace(); 
+
+            StringWriter sw0 = new StringWriter(); 
+
+            PrintWriter p0 = new PrintWriter(sw0, true); 
+
+            ex.printStackTrace(p0); 
+
+            erMesg = sw0.getBuffer().toString(); 
+
+ 
+
+            return false; 
+
+        } 
+
+    } 
+
+Logic to Download File 
+
+public synchronized boolean downloadFile(String localfilename) { 
+
+        try { 
+
+            InputStream is = m_client.getInputStream(); 
+
+            BufferedInputStream bis = new BufferedInputStream(is); 
+
+            System.out.println(">>>>>>>>>>>"+localfilename); 
+
+            OutputStream os = new FileOutputStream(localfilename); 
+
+            BufferedOutputStream bos = new BufferedOutputStream(os); 
+
+            byte[] buffer = new byte[1024]; 
+
+            int readCount; 
+
+ 
+
+            while ((readCount = bis.read(buffer)) > 0) { 
+
+                bos.write(buffer, 0, readCount); 
+
+            } 
+
+            bos.close(); 
+
+            is.close(); // close the FTP inputstream 
+
+            this.succMesg = "Downloaded!"; 
+
+ 
+
+            return true; 
+
+        } catch (Exception ex) { 
+
+            ex.printStackTrace(); 
+
+            StringWriter sw0 = new StringWriter(); 
+
+            PrintWriter p0 = new PrintWriter(sw0, true); 
+
+            ex.printStackTrace(p0); 
+
+            erMesg = sw0.getBuffer().toString(); 
+
+ 
+
+            return false; 
+
+        } 
+
+  
+
+Logic to Encrypt file 
+
+ 
+
+public String encrypt(String unencryptedString) { 
+
+        String encryptedString = null; 
+
+        try { 
+
+            cipher.init(Cipher.ENCRYPT_MODE, key); 
+
+            byte[] plainText = unencryptedString.getBytes(UNICODE_FORMAT); 
+
+            byte[] encryptedText = cipher.doFinal(plainText); 
+
+            encryptedString = new String(Base64.encodeBase64(encryptedText)); 
+
+        } catch (Exception e) { 
+
+            e.printStackTrace(); 
+
+        } 
+
+        return encryptedString; 
+
+    } 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+Logic to Decrypt 
+
+ 
+
+    public String decrypt(String encryptedString) { 
+
+        String decryptedText=null; 
+
+        try { 
+
+            cipher.init(Cipher.DECRYPT_MODE, key); 
+
+            byte[] encryptedText = Base64.decodeBase64(encryptedString); 
+
+            byte[] plainText = cipher.doFinal(encryptedText); 
+
+            decryptedText= new String(plainText); 
+
+        } catch (Exception e) { 
+
+            e.printStackTrace(); 
+
+        } 
+
+        return decryptedText; 
+
+    } 
